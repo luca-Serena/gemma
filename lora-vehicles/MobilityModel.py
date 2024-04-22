@@ -10,7 +10,8 @@ class MobilityModel(GEMMA_Component):
 	def retrieve_results (self, *args):
 		 pass
 
+	def getDelay (self):
+		return self.netlogo.report ("delay")
 
-
-
-
+	def getDeliveries(self):
+		return self.netlogo.report ("deliveries")
