@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, TypeVar
-
-T = TypeVar('T')  # Tipo generico
+from typing import Dict, List, TypeVar, Callable, Any
 
 class GEMMA_Component (ABC):
     def __init__(self):
@@ -19,17 +17,17 @@ class GEMMA_Director (GEMMA_Component):
         self.sub_models: Dict[GEMMA_Component] = {}
 
     @abstractmethod
-    def call_sub_model (self, function, *args):
+    def call_sub_model (self, function: Callable[..., Any], *args):
         #Call an underlying sub-model. A function must be passed to identify the specific type of call.
         pass
 
     @abstractmethod
-    def check_consistency(self, function, *args:T)->T:
+    def check_consistency(self, function: Callable[..., Any], *args):
         #Check the consistency of the the received data. A function must be passed to identify the specific type of call.
         pass
 
     @abstractmethod
-    def check_call_conditions(self, function ,*args)-> bool:
+    def check_call_conditions(self, function: Callable[..., Any] ,*args)-> bool:
         #Check the conditions for calling an underlying sub-model. A function must be passed to identify the specific type of call.
         pass
 
@@ -37,5 +35,3 @@ class GEMMA_Director (GEMMA_Component):
     def instantiate_sub_models(self, *args):
         #Create an instance of the underlying sub-models
         pass
-
-
