@@ -2,7 +2,6 @@ import numpy as np
 from scipy.integrate import odeint
 from GEMMA_Interfaces import GEMMA_Component
 
-
 class ODEModel(GEMMA_Component):
 
     # Definition of differential equations
@@ -15,8 +14,10 @@ class ODEModel(GEMMA_Component):
         dGdt = - (G - c / newP )
         return [dPdt, dGdt]
 
+    def setup():
+        pass
 
-    def run (self, equipped, notEquipped, avgProfit):
+    def advance (self, equipped, notEquipped, avgProfit):
         population = equipped + notEquipped
         P0 = equipped / (population)
         G0 = avgProfit
@@ -41,4 +42,10 @@ class ODEModel(GEMMA_Component):
         notEquipped = int((1 - y[-1:, 0]) * population)
         avgProfit = float (y[-1:, 1])
         return [equipped, notEquipped, avgProfit]
+
+    def check_call_conditions(self, checker, *args):
+        return checker.checkCallConditionsODE(*args)
+
+    def check_consistency (self, checker, *args):
+        return checker.checkConsistencyODE(*args)
 
