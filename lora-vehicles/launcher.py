@@ -18,7 +18,6 @@ class Launcher (GEMMA_Director):
         self.parameters["IoT_devices"] = IoT_devices
         self.parameters["margin_approximation"] = margin_approximation
 
-
     def instantiate_sub_models (self, *args):
         modelPath, NetLogoPath, version = args
         mobilityModel = MobilityModel(modelPath, NetLogoPath, version)
@@ -27,11 +26,37 @@ class Launcher (GEMMA_Director):
         self.sub_models ["ode"] = ode_model
 
 
-    def setup():
-        pass
+    def setup(self):
+        self.deliveries_over_time=[]
+        self.delay_over_time=[]
+        self.cost_over_time = []
+        self.equipped_vehicles_over_time = []
+        self.resultFile = "res.txt"
 
-    def advance():
-        pass
+    def advance(self, dt):
+        self.sub_models["mobility"].setup(population, initial_equipped_vehicles, IoT_devices)    #intial setup of Netlogo (clear-all, reset-ticks)
+        current_equipped_vehicles = self.parameters["initial_equipped_vehicles"] 
+        service_cost = self.parameters["initial_service_cost"]
+        for i in range (dt):
+            if self.sub_models["ode"].check_call_conditions(self, i, 0) == True:
+                print ("current_equipped_vehicles: ", current_equipped_vehicles, " average profit", service_cost)
+                current_equipped_vehicles, normal_vehicles, service_cost = self.sub_models["ode"].advance(current_equipped_vehicles, population - current_equipped_vehicles, service_cost)  # ODE model launched     
+                current_equipped_vehicles, normal_vehicles, service_cost = self.sub_models["ode"].check_consistency(self, current_equipped_vehicles, normal_vehicles, service_cost)
+                print (" product: ", current_equipped_vehicles * service_cost)  
+                delay =  self.sub_models["mobility"].getDelay()
+                deliveries = self.sub_models["mobility"].getDeliveries()
+                self.cost_over_time.append(service_cost)
+                self.deliveries_over_time.append (deliveries)
+                self.delay_over_time.append (0 if deliveries == 0 else delay/deliveries)
+                self.equipped_vehicles_over_time.append (current_equipped_vehicles)
+                self.sub_models["mobility"].update_vehicles(current_equipped_vehicles)
+
+            self.sub_models["mobility"].advance()         
+            time.sleep(0.005)     # in order to allow the user to visualize changes through time, otherwise it runs at maximum speed
+
+        self.retrieve_results()
+
+
 
     def check_consistency(self, *args):
         pass 
@@ -40,12 +65,11 @@ class Launcher (GEMMA_Director):
         pass        
 
     def retrieve_results (self, *args):
-        resFile, cost_list, deliveries_list, delay_list, vehicle_list = args 
-        with open (resFile, "w") as file:
-            for index, elem in enumerate (cost_list):
+        with open (self.resultFile, "w") as file:
+            for index, elem in enumerate (self.cost_over_time):
                 file.write ("At timestep " + str((index + 1) * self.parameters["update_frequency"]) + " cost for service: " +
-                 str(round(elem, 2)) + " with " + str(vehicle_list[index]) + " equipped vehicles. Deliveries: " + 
-                 str(deliveries_list[index]) + " with average delay: " + str(round(delay_list[index], 2)) + "\n")
+                 str(round(elem, 2)) + " with " + str(self.equipped_vehicles_over_time[index]) + " equipped vehicles. Deliveries: " + 
+                 str(self.deliveries_over_time[index]) + " with average delay: " + str(round(self.delay_over_time[index], 2)) + "\n")
 
 
 ############################################################################################################################################################
@@ -55,7 +79,9 @@ class Launcher (GEMMA_Director):
 
 NetLogoPath = '/home/senecaurla/Downloads/NetLogo'
 modelPath = '/home/senecaurla/Documents/phd/gemma/lora-vehicles/mobility.nlogo'
+
 steps = 1001
+
 update_frequency=50
 population = 100
 initial_equipped_vehicles = 10
@@ -64,40 +90,9 @@ initial_service_cost = 1
 margin_approximation = 1
 IoT_devices = 5
 
-current_equipped_vehicles = initial_equipped_vehicles
-service_cost = initial_service_cost
-deliveries_over_time=[]
-delay_over_time=[]
-cost_over_time = []
-equipped_vehicles_over_time = []
-resultFile = "res.txt"
-
-
 director = Launcher([update_frequency, population, initial_equipped_vehicles, initial_service_cost, IoT_devices, margin_approximation])
+director.setup()
 director.instantiate_sub_models (modelPath, NetLogoPath, '6.0')
-consistency_checker = ConsistencyChecker (director)
-conds_checker = CallConditionsChecker(director)
 
-director.sub_models["mobility"].setup(population, initial_equipped_vehicles, IoT_devices)    #intial setup of Netlogo (clear-all, reset-ticks)
-
-for i in range (steps):
-    if director.sub_models["ode"].check_call_conditions (conds_checker, i, 0) == True:
-        print ("current_equipped_vehicles: ", current_equipped_vehicles, " average profit", service_cost)
-        current_equipped_vehicles, normal_vehicles, service_cost = director.sub_models["ode"].advance(current_equipped_vehicles, population - current_equipped_vehicles, service_cost)  # ODE model launched     
-        current_equipped_vehicles, normal_vehicles, service_cost = director.sub_models["ode"].check_consistency(consistency_checker, current_equipped_vehicles, normal_vehicles, service_cost)
-        print (" product: ", current_equipped_vehicles * service_cost)  
-
-        delay =  director.sub_models["mobility"].getDelay()
-        deliveries = director.sub_models["mobility"].getDeliveries()
-        cost_over_time.append(service_cost)
-        deliveries_over_time.append (deliveries)
-        delay_over_time.append (0 if deliveries == 0 else delay/deliveries)
-        equipped_vehicles_over_time.append (current_equipped_vehicles)
-        director.sub_models["mobility"].update_vehicles(current_equipped_vehicles)
-
-    director.sub_models["mobility"].advance()         
-    time.sleep(0.005)     # in order to allow the user to visualize changes through time, otherwise it runs at maximum speed
-
-
-director.retrieve_results(resultFile, cost_over_time, deliveries_over_time, delay_over_time, equipped_vehicles_over_time)
+director.advance(steps)
 print ("Simulation Ended")

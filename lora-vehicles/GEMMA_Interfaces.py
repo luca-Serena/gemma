@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from checkers import CallConditionsChecker, ConsistencyChecker
+from checkers import ConsistencyChecker, CallConditionsChecker
 from typing import Dict, TypeVar, Any
 
 class GEMMA_Component (ABC):
@@ -22,17 +22,17 @@ class GEMMA_Component (ABC):
         pass
 
     @abstractmethod
+    def check_call_conditions(self, checker: CallConditionsChecker )-> bool:
+        #Check the conditions for calling an underlying sub-model. A function must be passed to identify the specific type of call.
+        pass
+
+    @abstractmethod
     def check_consistency(self, checker: ConsistencyChecker ):
         #Check the consistency of the the received data. A function must be passed to identify the specific type of call.
         pass
 
-    @abstractmethod
-    def check_call_conditions(self, checker: CallConditionsChecker)-> bool:
-        #Check the conditions for calling an underlying sub-model. A function must be passed to identify the specific type of call.
-        pass
 
-
-class GEMMA_Director (GEMMA_Component):
+class GEMMA_Director (GEMMA_Component, CallConditionsChecker, ConsistencyChecker):
     def __init__(self):
         super().__init__()
         self.sub_models: Dict[GEMMA_Component] = {}
