@@ -5,22 +5,40 @@ globals [
   delay
   deliveries
   update_frequency
+  min-distance-sensors
 ]
 turtles-own [
   lora-status
+  destination
 ]
 
 to setup [vehicles-population lora-population devices]
   clear-all
+  random-seed 123
+  set min-distance-sensors 10
   set vehicles-total vehicles-population
   set devices-total devices
   set delay 0
   set deliveries 0
   set update_frequency 50
 
+  create-turtles devices-total [
+    set color white
+    set size 2
+    set shape "target"
+    setxy random-pxcor random-pycor
+    set lora-status "device-with-data"
+     ; Check if there are other agents in the neighborhood
+    while [any? other turtles in-radius min-distance-sensors]
+    [
+      setxy random-xcor random-ycor
+    ]
+  ]
+
   create-turtles lora-population [
     set color green
     setxy random-pxcor random-pycor
+    set destination one-of patches
     set shape "car"
     set size 1
     set lora-status "YES"
@@ -29,18 +47,12 @@ to setup [vehicles-population lora-population devices]
   create-turtles vehicles-population - lora-population [
     set color yellow
     setxy random-pxcor random-pycor
+    set destination one-of patches
     set shape "car"
     set size 1
     set lora-status "NO"
   ]
 
-  create-turtles devices-total [
-    set color white
-    set size 2
-    set shape "target"
-    setxy random-pxcor random-pycor
-    set lora-status "device-with-data"
-  ]
   reset-ticks
 end
 
@@ -93,9 +105,11 @@ end
 
 
 to wander  ;; person procedure
-  rt random-float 50
-  lt random-float 50
-  fd 1
+   face destination
+   forward 1
+   if distance destination < 1 [
+     set destination one-of patches
+   ]
 end
 
 to print-results

@@ -88,7 +88,7 @@ initial_equipped_vehicles = 10
 initial_service_cost = 1
 #the product between the service cost and the number of equipped vehicles should be costant (allowing a certain margin of approximation)
 margin_approximation = 1
-IoT_devices = 5
+IoT_devices = 20
 
 director = Launcher([update_frequency, population, initial_equipped_vehicles, initial_service_cost, IoT_devices, margin_approximation])
 director.setup()

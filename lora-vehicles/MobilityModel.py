@@ -5,11 +5,8 @@ import pyNetLogo
 class MobilityModel(GEMMA_Component):
 
 	def __init__(self, modelPath, NetLogoPath, version):
-		self.netlogo = pyNetLogo.NetLogoLink(gui=True, netlogo_home=NetLogoPath, netlogo_version='6.0')  # Linking with NetLogo
+		self.netlogo = pyNetLogo.NetLogoLink(gui=True, netlogo_home=NetLogoPath, netlogo_version=version)  # Linking with NetLogo
 		self.netlogo.load_model(modelPath)  
-
-	def retrieve_results (self, *args):
-		 pass
 
 	def setup (self, *args):
 		population, initial_equipped_vehicles, IoT_devices = args
@@ -17,6 +14,9 @@ class MobilityModel(GEMMA_Component):
 
 	def advance(self):
 		self.netlogo.command('go')
+
+	def retrieve_results (self, *args):
+		 pass
 
 	def check_call_conditions (self, checker):
 		pass

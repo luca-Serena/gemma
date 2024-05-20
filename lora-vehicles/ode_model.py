@@ -44,8 +44,8 @@ class ODEModel(GEMMA_Component):
         return [equipped, notEquipped, avgProfit]
 
     def check_call_conditions(self, checker, *args):
-        return checker.checkCallConditionsODE(checker,*args)
+        return checker.checkCallConditionsODE(self,*args)
 
     def check_consistency (self, checker, *args):
-        return checker.checkConsistencyODE(checker, *args)
+        return checker.checkConsistencyODE(self, *args)
 

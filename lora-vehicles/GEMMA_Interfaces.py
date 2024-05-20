@@ -22,12 +22,12 @@ class GEMMA_Component (ABC):
         pass
 
     @abstractmethod
-    def check_call_conditions(self, checker: CallConditionsChecker )-> bool:
+    def check_call_conditions(self, submodel, *args )-> bool:
         #Check the conditions for calling an underlying sub-model. A function must be passed to identify the specific type of call.
         pass
 
     @abstractmethod
-    def check_consistency(self, checker: ConsistencyChecker ):
+    def check_consistency(self, submodel, *args ):
         #Check the consistency of the the received data. A function must be passed to identify the specific type of call.
         pass
 
