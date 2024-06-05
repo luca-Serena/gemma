@@ -9,7 +9,7 @@ class MobilityModel(GEMMA_Component):
 		self.netlogo.load_model(modelPath)  
 
 	def setup (self, population):
-		self.netlogo.command('setup ' + str(population)) 
+		self.netlogo.command('setup ' + str(population))     #initialize the model, providing the overall number of vehicles
 
 	def advance(self):
 		self.netlogo.command('go')

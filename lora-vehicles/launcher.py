@@ -43,8 +43,8 @@ class Launcher (GEMMA_Director):
                 current_equipped_vehicles, normal_vehicles, service_cost = self.sub_models["ode"].advance(current_equipped_vehicles, population - current_equipped_vehicles, service_cost)  # ODE model launched     
                 current_equipped_vehicles, normal_vehicles, service_cost = self.sub_models["ode"].check_consistency(self, current_equipped_vehicles, normal_vehicles, service_cost)
                 print (" product: ", current_equipped_vehicles * service_cost)  
-                delay =  self.sub_models["mobility"].getDelay()
-                deliveries = self.sub_models["mobility"].getDeliveries()
+                delay =  self.sub_models["mobility"].getDelay()              #ask the mobility model the total delay for deliveries in the last round
+                deliveries = self.sub_models["mobility"].getDeliveries()     #ask the mobility model the total number of deliveries in the last round
                 self.cost_over_time.append(service_cost)
                 self.deliveries_over_time.append (deliveries)
                 self.delay_over_time.append (0 if deliveries == 0 else delay/deliveries)
@@ -52,8 +52,6 @@ class Launcher (GEMMA_Director):
                 self.sub_models["mobility"].update_vehicles(current_equipped_vehicles)
 
             self.sub_models["mobility"].advance()         
-            time.sleep(0.005)     # in order to allow the user to visualize changes through time, otherwise it runs at maximum speed
-
         self.retrieve_results()
 
 

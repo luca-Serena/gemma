@@ -1,6 +1,10 @@
 import numpy as np
 from scipy.integrate import odeint
-from GEMMA_Interfaces import GEMMA_Component
+from GEMMA_Interfaces import GEMMA_Component, GEMMA_Director
+from MobilityModel import MobilityModel
+from ode_model import ODEModel
+from checkers import ConsistencyChecker, CallConditionsChecker
+
 
 class ODEModel(GEMMA_Component):
 

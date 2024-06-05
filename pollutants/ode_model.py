@@ -13,7 +13,7 @@ from GEMMA_Interfaces import GEMMA_Component
 class ODEModel(GEMMA_Component):
 
 	def pollution_model(self, state : tuple, time : np.ndarray, 
-		β : float, σ : float, γ : float) -> tuple: 		 #β change from petroil to GPL
+		β : float, σ : float, γ : float) -> tuple: 
 		petroil, GPL, electric = state
 		δpetroil = - β*petroil - σ*petroil
 		δGPL =  β*petroil - γ*GPL
@@ -25,7 +25,7 @@ class ODEModel(GEMMA_Component):
 		pass
 
 
-	def advance (self, petroil, GPL, electric, incentive): #, duration, beta):
+	def advance (self, petroil, GPL, electric, incentive): 
 		time = np.linspace(0, 1, 1000)
 		state0 = (petroil, GPL, electric)
 		β, σ, γ = 0.1 * incentive, 0.08 * incentive, 0.02 * incentive	

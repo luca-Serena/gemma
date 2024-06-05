@@ -3,7 +3,7 @@ class CallConditionsChecker():
 	def checkCallConditionsMobility(self, submodel, *args):
 		pass
 
-	def checkCallConditionsODE (self, submodel, *args):
+	def checkCallConditionsODE (self, submodel, *args):   #the ODE model is called every update_frequency steps
 		step, update_unit = args
 		if step % self.parameters["update_frequency"] == update_unit and step > 0:
 			return True
